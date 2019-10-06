@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Echart</title>
+    <!-- 引入 echarts.js -->
+    <script type="text/javascript" src="js/echarts.js"></script>
+</head>
+<body>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="width: 1500px;height:500px;" ></div>
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+     
+        // 指定图表的配置项和数据
+        var option = {
+        	    title: {
+        	        text: '近五十年地震次数趋势'
+        	    },
+        	    tooltip: {
+        	        trigger: 'axis'
+        	    },
+        	    legend: {
+        	        data:['5级-6级','6级以上']
+        	    },
+        	    grid: {
+        	        left: '3%',
+        	        right: '4%',
+        	        bottom: '3%',
+        	        containLabel: true
+        	    },
+        	    toolbox: {
+        	        feature: {
+        	            saveAsImage: {}
+        	        }
+        	    },
+        	    xAxis: {
+        	        type: 'category',
+        	        data: ['1965-1975','1975-1985','1985-1995','1995-2005','2005-2015']
+        	    },
+        	    yAxis: {
+        	        type: 'value'
+        	    },
+        	    series: [
+        	        {
+        	            name:'5级-6级',
+        	            type:'line',
+        	            stack: '总量',
+        	            data:[588, 2921, 3312, 3333, 3741]
+        	        },
+        	        {
+        	            name:'6级以上',
+        	            type:'line',
+        	            stack: '总量',
+        	            data:[238, 2000, 1488, 1471, 1669]
+        	        },
+        	       
+        	    ]
+        	};
+    
+	     myChart.setOption(option);
+	   
+    </script>
+</body>
+</html>

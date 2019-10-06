@@ -1,0 +1,90 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+	<head>
+		<meta charset="utf-8" />
+	    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+		<title>地震数据可视化</title>
+		<link rel="stylesheet" href="css/bootstrap.min.css" />
+		<link rel="stylesheet" href="css/app.css" />
+		<script>
+		function to1(){
+			window.location.href="count2.html";
+		}
+		function to2(){
+			window.location.href="count1.html";
+		}
+			function to3(){
+				window.location.href="fiftyyearchart.html";
+			}
+			function to4(){
+				window.location.href="count.html";
+			}
+		</script>
+		<style type="text/css">
+		h3{
+		color:white
+		}
+		</style>
+	</head>
+	
+	<body class="bg01">
+		<header class="header">
+			<h3>地震数据可视化</h3>
+		</header>
+		
+		<div class="wrapper">
+			<div class="container-fluid">
+				<div class="row fill-h">
+					
+					<div class="col-lg-6 fill-h">
+						<div class="xpanel-wrapper xpanel-wrapper-3">
+							<div class="xpanel">
+								<!-- 地图散点 -->
+								<div class="fill-h" id="scatterMap">
+								
+								<h3>指定日期地震点</h3>
+								
+								<img onclick="to1()" class="thumb" src="img/4.png" width="100%" height="100%"/></div>
+							</div>
+						</div>
+						<div class="xpanel-wrapper xpanel-wrapper-3">
+							<div class="xpanel">
+								<!-- 近五十年地震趋势 -->
+								<div class="fill-h" id="countyMap"></div>
+								
+								<h3>近五十年地震趋势</h3>
+								<img  onclick="to3()" class="thumb" src="img/3.png" width="100%" height="100% "/>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6 fill-h">
+						<div class="xpanel-wrapper xpanel-wrapper-3">
+							<div class="xpanel">
+								<!-- 地图散点 -->
+								<div class="fill-h" id="scatterMap">
+								
+								<h3>指定时间地震次数统计</h3>
+								<img onclick="to2()" class="thumb" src="img/6.png" width="100%" height="90%"/></div>
+							</div>
+						</div>
+						<div class="xpanel-wrapper xpanel-wrapper-3">
+							<div class="xpanel">
+								<!-- 近五十年地震趋势 -->
+								<div class="fill-h" id="countyMap"></div>
+								
+								<h3>指定区域地震次数统计</h3>
+								<img onclick="to4()" class="thumb" src="img/2.png" width="100%" height="100%"/>
+							</div>
+						</div>
+					</div>
+				
+				</div>
+			</div>
+		</div>
+		
+
+	</body>
+</html>

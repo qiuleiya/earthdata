@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>全球站点分布</title>
+<script type="text/javascript" src="./js/echarts.js"></script>
+<script type="text/javascript" src="./js/jquery-3.3.1.min.js"></script>
+</head>
+<body>
+<div>
+起始年份: <input type="date" id="s">
+结束年份: <input type="date" id="e">
+<button onClick="beat()">查找</button></div>
+<div id="main" style="width:1200px;height: 600px"></div>
+	<script type="text/javascript">
+	function beat(){
+		var s=$("#s").val();
+		var e=$("#e").val();
+		window.location.href="station.html?startDate="+s+"&endDate="+e;}
+	//初始化echarts的内置对象	
+	  var myEchart = echarts.init(document.getElementById('main'));
+	//获取提交的页面路径的参数
+		var args=location.search;
+	var mapInfoUrl = 'data/world.json';
+	var url="EarthDataServlet"+args;
+	var myData = [];
+$.get(mapInfoUrl,function(data){
+		//注册地图
+		echarts.registerMap('world',data);
+		var option={
+			tooltip:{
+				trigger:'item',
+				formatter:'{b}'
+			},
+			geo:[{
+				name:'世界地图',
+				type:'map',
+				map:'world',
+				roam:'false',
+				selectMode:'false',
+				itemStyle:{
+					normal:{
+						areaColor:'#234543',
+						borderColor:'#666'
+					}
+				}
+			}],
+			series:[{
+				name:'站点',
+				type:'scatter',
+				coordinateSystem:'geo',
+				data:myData
+			}]
+		};
+		myEchart.setOption(option);
+		//发送ajax请求,处理后台返回的数据
+		$.get(url,function(data){
+			data=JSON.parse(data);
+			//alert(data);
+			//显示图标
+			myEchart.setOption(option={
+					series:[{
+						name:'站点',
+						type:'scatter',
+						symbolSize:'2',
+						coordinateSystem:'geo',
+						data:data
+					}]	
+			});
+		});
+		
+	});
+	</script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>确定经纬度地震次数统计</title>
+<script type="text/javascript" src="js/echarts.js"></script>
+<script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+</head>
+<body>
+<div>
+a: <input type="text" id="la">
+g: <input type="text" id="lo">
+<button onClick="beat()">查找</button></div>
+<div id="valuema_display" style="width:1200px;height: 600px"></div>
+	<script type="text/javascript">
+	function beat(){
+		var a=$("#la").val();
+		var g=$("#lo").val();
+		a=19;
+		g=145;
+		window.location.href="NumberCount.html?lati="+a+"&longi="+g;}
+	//初始化echarts的内置对象	
+	var valuem=echarts.init(document.getElementById('valuema_display'));
+	//获取提交的页面路径的参数
+	var args=location.search;
+	
+	var url="ValueStrengthServlet"+args;
+
+	$.get(url,function(data){
+		alert("Data Loaded: " + data);
+		data = JSON.parse(data);
+		valuem.hideLoading();
+		
+		valuem.setOption(option = {
+				
+				tooltip: {
+			        trigger: 'axis',
+			        axisPointer: {
+			            type: 'cross',
+			            crossStyle: {
+			                color: '#999'
+			            }
+			        }
+			    },
+			    toolbox: {
+			        feature: {
+			            dataView: {show: true, readOnly: false},
+			            magicType: {show: true, type: ['line', 'bar']},
+			            restore: {show: true},
+			            saveAsImage: {show: true}
+			        }
+			    },
+			    legend: {
+			        data:['次数']
+			    },
+			    xAxis: [
+			        {
+			            type: 'category',
+			            data: ['5-6','6-7','7-8','8-9','9-10'],
+			            axisPointer: {
+			                type: 'shadow'
+			            }
+			        }
+			    ],
+			    yAxis: [
+			        {
+			            type: 'value',
+			            name: '次数',
+			            min: 0,
+			            max: 200,
+			            interval: 10,
+			            axisLabel: {
+			                formatter: '{value} ci'
+			            }
+			        },
+			    ],
+			    series: [
+			        {
+			            name:'地震次数',
+			            type:'bar',
+			            data:[
+				                {value:data.five, name:'五级至六级'},
+				                {value:data.six, name:'六级至七级'},
+				                {value:data.seven, name:'七级到八级'},
+				                {value:data.eight, name:'八级到九级'},
+				                {value:data.nine, name:'九级到十级'}
+				            ]
+				            
+			        }
+			    ]
+		    	
+				
+		});
+	});
+	
+</script>
+</body>
+</html>

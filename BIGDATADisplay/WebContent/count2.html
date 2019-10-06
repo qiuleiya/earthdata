@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+起始年份: <input type="date" id="s">
+结束年份: <input type="date" id="e">
+<button onClick="beat()">查找</button>
+<script src="js/jquery-3.3.1.min.js"></script>
+<script type="text/javascript">
+function beat(){
+	var s=$("#s").val();
+	var e=$("#e").val();
+	window.location.href="station.html?startDate="+s+"&endDate="+e;
+}
+
+</script>
+</body>
+</html> 

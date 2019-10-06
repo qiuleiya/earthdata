@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>全球站点分布</title>
+<script type="text/javascript" src="./js/echarts.js"></script>
+<script type="text/javascript" src="./js/jquery-3.3.1.min.js"></script>
+<link rel="stylesheet" href="css/bootstrap.min.css" />
+<link rel="stylesheet" href="css/app.css" />
+<style>
+input{
+color:black
+}
+button{
+color:black
+}
+</style>
+<script>
+function locate(){
+	var a=$("#la").val();
+	var g=$("#lo").val();
+	a=19;
+	g=145;
+	var args="?lati="+a+"&longi="+g;
+	//window.location.href="NumberCount.html?lati="+a+"&longi="+g;
+	var valuem=echarts.init(document.getElementById('valuema_display'));
+	var url="ValueStrengthServlet"+args;
+
+	$.get(url,function(data){
+		//alert("Data Loaded: " + data);
+		data = JSON.parse(data);
+		valuem.hideLoading();
+		
+		valuem.setOption(option = {
+				
+				tooltip: {
+					formatter:'{b}: {c}次',
+			        trigger: 'axis',
+			        axisPointer: {
+			            type: 'cross',
+			            crossStyle: {
+			                color: '#999'
+			            }
+			        }
+			    },
+			    toolbox: {
+			        feature: {
+			            dataView: {show: true, readOnly: false},
+			            magicType: {show: true, type: ['line', 'bar']},
+			            restore: {show: true},
+			            saveAsImage: {show: true}
+			        }
+			    },
+
+			    xAxis: [
+			        {
+		                textStyle:{
+                            color: '#fff'//字体颜色
+                        },
+			            type: 'category',
+			            data: ['5-6级','6-7级','7-8级','8-9级','9-10级'],
+			            axisPointer: {
+			                type: 'shadow'
+			            }
+			        }
+			    ],
+			    yAxis: [
+			        {
+		                textStyle:{
+                            color: '#ffffff'//字体颜色
+                        },
+			            type: 'value',
+			            name: '次数',
+			            min: 0,
+			            max: 1000,
+			            interval: 100,
+			            axisLabel: {
+			            	textStyle: {
+                                color: '#fff'
+                            },
+			                formatter: '{value} 次'
+			            }
+			        },
+			    ],
+			    series: [
+			        {
+			        	color:'#B3B0DD',
+			            name:'地震次数',
+			            type:'bar',
+			            data:[
+				                {value:data.five, name:'五级至六级'},
+				                {value:data.six, name:'六级至七级'},
+				                {value:data.seven, name:'七级到八级'},
+				                {value:data.eight, name:'八级到九级'},
+				                {value:data.nine, name:'九级到十级'}
+				            ]
+				            
+			        }
+			    ]	
+		});
+	});
+	
+}
+
+function jump23D(){
+	var s=$("#s").val();
+	var e=$("#e").val();
+	s="1998-3-4";
+	e="1999-4-5";
+	window.location.href="renderglobe.html?startDate=" + s+"&endDate="+e;
+}
+
+function beat(){
+	var s=$("#s").val();
+	var e=$("#e").val();
+	//s="1998-3-4";
+	//e="1999-4-5";
+	if(s=="" || e==""){
+		alert("请输入正确的日期")
+	}else{
+		window.location.href="worldmap.html?startDate="+s+"&endDate="+e;
+	}
+}
+	
+</script>
+</head>
+<body class="bg05" >
+		<header class="header">
+			<h3>全球地震可视化分析</h3>
+		</header>
+		
+
+		<div class="wrapper" >
+			<div class="container-fluid">
+				<div class="row fill-h">
+					<!-- 左边的3d图,这里放地图 -->
+					<div class="col-lg-7 fill-h">
+						<div class="xpanel-wrapper xpanel-wrapper-1">
+							<div class="xpanel no-bg" style="color:white" >
+								起始年份: <input type="date" id="s">
+								结束年份: <input type="date" id="e">
+								<button class="btn btn-primary btn-sm" onClick="beat()">查找</button>
+								<button class="btn btn-primary btn-sm" onClick="jump23D()">3D地球查看</button>
+								<div class="fill-h" id="main"></div>
+							</div>
+						</div>
+					</div>
+					<!-- 右边的整块区域 -->
+					<div class="col-lg-5 fill-h">
+						<!-- 右上角,放饼图? -->
+						<div class="xpanel-wrapper xpanel-wrapper-2">
+							<div class="xpanel">
+								<div class="fill-h" id="datema_display" ></div>
+							</div>
+						</div>
+						<!-- 右下角 -->
+						<div class="xpanel-wrapper xpanel-wrapper-2">
+							<div class="xpanel" style="color:white">
+								经度: <input type="text" id="la">
+								纬度: <input  type="text" id="lo">
+								<button  class="btn btn-primary btn-sm" onClick="locate()">查找</button>
+								<div class="fill-h" id="valuema_display"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+	<script type="text/javascript">
+	
+	//初始化echarts的内置对象	
+	  var myEchart = echarts.init(document.getElementById('main'));
+	//获取提交的页面路径的参数
+	var args=location.search;
+	var mapInfoUrl = 'data/world.json';
+	var url="EarthDataServlet"+args;
+	var myData = [];
+	$.get(mapInfoUrl,function(data){
+		//注册地图
+		echarts.registerMap('world',data);
+		var option={
+			tooltip:{
+				formatter:function(params){
+					 var res = params.name+'<br/>' + 
+					 		'Location: ' + params.value;
+		                return res;
+				},
+				trigger:'item',
+				//formatter:'{b}'
+			},
+			geo:[{
+				name:'世界地图',
+				type:'map',
+				map:'world',
+				roam:'false',
+				selectMode:'false',
+				itemStyle:{
+					normal:{
+						areaColor:'#101020',
+						borderColor:'#ffffff'
+					}
+				}
+			}],
+			series:[{
+				name:'站点',
+				type:'scatter',
+				coordinateSystem:'geo',
+				data:myData
+			}],
+		};
+		myEchart.setOption(option);
+		//画点点
+		$.get(url,function(data){
+			data=JSON.parse(data);
+			//alert(data);
+			//显示图标
+
+			myEchart.setOption(option={
+					series:[{
+						name:'站点',
+						type:'scatter',
+						symbolSize:'5',
+			            itemStyle: {
+	                    	color: '#FFF424'
+	            		},
+						coordinateSystem:'geo',
+						data:data
+					}]	
+			});
+		});
+		
+		//更新饼图
+		var url2="DatemagnitudeServlet"+args;
+		
+		$.get(url2,function(data){
+			//alert("Data Loaded: " + data);
+			data = JSON.parse(data);
+			datem.hideLoading();
+			datem.setOption(option = {
+				    title : {
+				        text:'不同震级次数统计',
+				        subtext: '指定年份不同震级的次数',
+				        x:'center'
+				    },
+				    tooltip : {
+				        trigger: 'item',
+				        formatter: "{a} <br/>{b} : {c} ({d}%)"
+				    },
+				    legend: {
+				        x : 'center',
+				        y : 'bottom',
+				        data:['五级至六级','六级至七级','七级到八级','八级到九级','九级到十级']
+				    },
+				    toolbox: {
+				        show : true,
+				        feature : {
+				            mark : {show: true},
+				            dataView : {show: true, readOnly: false},
+				            magicType : {
+				                show: true,
+				                type: ['pie', 'funnel']
+				            },
+				            restore : {show: true},
+				            saveAsImage : {show: true}
+				        }
+				    },
+				    calculable : true,
+				    series : [
+				     
+				        {
+				            name:'震级次数',
+				            type:'pie',
+				            radius : '50%',
+				            center: ['50%', '60%'],
+				            roseType : 'radius',
+				            data:[
+				                {value:data.five, name:'五级至六级'},
+						                {value:data.six, name:'六级至七级'},
+						                {value:data.seven, name:'七级到八级'},
+						                {value:data.eight, name:'八级到九级'},
+						                {value:data.nine, name:'九级到十级'}
+				            ]
+				        }
+				    ]
+				});
+		});
+		
+	});
+	
+	//开始加载条形图
+
+	var valuem=echarts.init(document.getElementById('valuema_display'));
+
+		
+		valuem.setOption(option = {
+				
+				tooltip: {
+					//formatter:'{b}:{c}次',
+			        trigger: 'axis',
+			        axisPointer: {
+			            type: 'cross',
+			            crossStyle: {
+			                color: '#999'
+			            }
+			        }
+			    },
+			    toolbox: {
+			        feature: {
+			            dataView: {show: true, readOnly: false},
+			            magicType: {show: true, type: ['line', 'bar']},
+			            restore: {show: true},
+			            saveAsImage: {show: true}
+			        }
+			    },
+			    legend: {
+	                textStyle:{
+	                            color: '#ffffff'//字体颜色
+                       },
+			        data:['次数']
+			    },
+			    xAxis: [
+			        {
+		                textStyle:{
+                            color: '#ffffff'//字体颜色
+                        },
+			            type: 'category',
+			            data: ['5-6级','6-7级','7-8级','8-9级','9-10级'],
+			            axisPointer: {
+			                type: 'shadow'
+			            }
+			        }
+			    ],
+			    yAxis: [
+			        {
+		                textStyle:{
+                            color: '#ffffff'//字体颜色
+                        },
+			            type: 'value',
+			            name: '次数',
+			            min: 0,
+			            max: 1000,
+			            interval: 100,
+			            axisLabel: {
+			            	textStyle: {
+                                color: '#fff'
+                            },
+			                formatter: '{b}: {c} 次'
+			            }
+			        },
+			    ],
+			    series: [
+			        {
+			            name:'地震次数',
+			            type:'bar',
+			            data:[]  
+			        }
+			    ]	
+		});
+
+		//饼图....
+		var datem=echarts.init(document.getElementById('datema_display'));
+		
+		datem.setOption(option = {
+			    title : {
+			    	textStyle:{ //设置主标题风格
+			    		color:'#fff',//设置主标题字体颜色
+		    		},
+			        text:'不同震级次数统计',
+			        subtext: '指定年份不同震级的次数',
+			        x:'center'
+			    },
+			    tooltip : {
+			        trigger: 'item',
+			        formatter: "{a} <br/>{b} : {c} ({d}%)"
+			    },
+			    legend: {
+	                textStyle:{
+                        color: '#ffffff'//字体颜色
+               		},
+			        x : 'center',
+			        y : 'bottom',
+			        data:['五级至六级','六级至七级','七级到八级','八级到九级','九级到十级']
+			    },
+			    toolbox: {
+			        show : true,
+			        feature : {
+			            mark : {show: true},
+			            dataView : {show: true, readOnly: false},
+			            magicType : {
+			                show: true,
+			                type: ['pie', 'funnel']
+			            },
+			            restore : {show: true},
+			            saveAsImage : {show: true}
+			        }
+			    },
+			    calculable : true,
+			    series : [
+			        {
+			            name:'震级次数',
+			            type:'pie',
+			            radius : [20, 110],
+			            center: ['50%', '60%'],
+			            roseType : 'radius',
+			            data:[]
+			        }
+			    ]
+			});
+	
+	</script>
+</body>
+</html>

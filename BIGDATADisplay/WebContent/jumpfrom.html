@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+	<head>
+		<meta charset="utf-8" />
+	    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+		<title>全球地震可视化分析</title>
+		<link rel="stylesheet" href="css/bootstrap.min.css" />
+		<link rel="stylesheet" href="css/app.css" />
+		<style>
+		input{
+		color:black
+		}
+		button{
+		color:black
+		}
+		</style>
+	</head>
+	<script>
+		function beat() {
+			var s=$("#s").val();
+			var e=$("#e").val();
+			//s="1998-3-4";
+			//e="1999-4-5";
+			if(s=="" || e=="") {
+				alert("请输入正确的日期")
+			}else{
+				window.location.href="worldmap.html?startDate="+s+"&endDate="+e;
+			}
+		}
+		function toStatic(){
+			window.location.href="index.html";
+		}
+	</script>	
+	<style>
+		
+	</style>
+	
+	<body class="bg05">
+		<!-- 标题 -->
+		<header class="header">
+			<h3>全球地震可视化分析</h3>
+		</header>
+		
+		<div class="wrapper">
+			<div class="container-fluid">
+				<div class="row fill-h">
+					<!-- 左边的3d图,这里放地图 -->
+					<div class="col-lg-7 fill-h">
+						<div class="xpanel-wrapper xpanel-wrapper-1">
+							<div class="xpanel no-bg" style="color:white" >
+								起始年份: <input type="date" id="s">
+								结束年份: <input type="date" id="e">
+								<button class="btn btn-primary btn-sm" onClick="beat()">查找</button>
+								<div class="fill-h" id="main"></div>
+							</div>
+						</div>
+					</div>
+					<!-- 右边的整块区域 -->
+					<div class="col-lg-5 fill-h">
+						<!-- 右上角,放饼图? -->
+						<div class="xpanel-wrapper xpanel-wrapper-2-3">
+							<div class="xpanel">
+								<div class="fill-h" id="globe3D"></div>
+							</div>
+						</div>
+						<!-- 右下角 -->
+						<div class="xpanel-wrapper xpanel-wrapper-1-3">
+							<div class="xpanel" onclick="toStatic();" style="color:#3E65AC;text-align:center;font-size:80px">
+								<div style="position:relative;"> 静态数据 </div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+	
+		<script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+		<script type="text/javascript" src="js/echarts.js"></script>
+		<script type="text/javascript" src="js/echarts-gl.min.js"></script>
+		
+		<script type="text/javascript">
+		
+			$(function() {
+				
+			var args=location.search;	
+			var url="EarthDataServlet"+args;
+			var myData = [];
+			const myEchart=echarts.init(document.getElementById("main"));
+			var mapInfoURL="data/world.json";
+			$.get(mapInfoURL,function(data){
+					echarts.registerMap('world',data);
+							var option={
+			//添加提示框组件. 这里是散点图
+			tooltip:{
+				trigger:'item',  
+				formatter:'{b}'
+			},
+			geo:[{
+				name:'世界地图',
+				map:'world',//世界地图
+				type:'map',
+				roam:'false',
+				selectMode:'false',
+				itemStyle:{
+					normal:{
+						areaColor:'#101020',
+						borderColor:'#ffffff'
+					}
+				}
+			}],
+			series:[{
+				name:'站点',
+				type:'scatter',
+				coordinateSystem:'geo',//使用地图组件
+				data:myData
+			}]
+		};
+		
+		//指定世界地图:应用
+		myEchart.setOption(option);//前端要拿到这个数据,可以用ajax. 
+		});
+
+				/******************* 3D柱形图 ******************/
+				//初始化echarts实例	
+				
+				/****************** 3D地球 ********************/
+				//初始化echart实例
+				const globe3D = echarts.init(document.getElementById("globe3D"));
+				//配置项
+				const globeOpt = {
+				    globe: {
+				    	environment: 'img/bg09.jpg', //环境贴图
+				        baseTexture: "img/globe.jpg", //地球的纹理
+				        heightTexture: "img/globe.jpg", //地图的高度纹理
+				        displacementScale: 0, //地球顶点位移的大小
+				        shading: 'realistic', //着色效果，真实感渲染
+				        realisticMaterial: { //真实感渲染配置
+				            roughness: 0.8 //材质的粗糙度
+				        },
+				        postEffect: { //后处理特效配置
+				            enable: true
+				        },
+				        light: { //光照设置
+				            main: { //场景主光源设置，在globe设置中就是太阳光
+				                intensity: 5, //主光源强度
+				                shadow: true //是否投影
+				            },
+				            ambientCubemap: { //使用纹理作为光源的环境光， 会为物体提供漫反射和高光反射
+				                texture: 'img/pisa.hdr', //环境光贴图
+				                diffuseIntensity: 0.1 //漫反射强度
+				            }
+				        }
+				    }
+				};
+				//渲染图表
+				globe3D.setOption(globeOpt);
+				
+				globe3D.on('click',function(){
+					alert("1");
+						windows.location.href="renderglobe.html";			
+				});
+				
+				/******************* 二维数据的3D展示 ******************/
+
+				/********** 浏览器窗口改变时，重置报表大小 ****************/
+			});
+		</script>
+	</body>
+</html>
